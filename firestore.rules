@@ -1,0 +1,46 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    // 
+    // Collection: /users/{userId}
+    // Document ID: Firebase Auth UID
+    // Fields:
+    //   - email: string (required) - User's email
+    //   - originAddr: string (optional) - Home address
+    //   - destinationAddr: string (optional) - School/Destination address
+    //   - route: string (optional) - JSON string of route
+    //   - schedule: string (optional) - JSON string of schedule
+    //   - createdAt: timestamp (optional)
+    //   - updatedAt: timestamp (optional)
+    //
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isValidUser(data) {
+      return data.keys().hasOnly(['email', 'originAddr', 'destinationAddr', 'route', 'schedule', 'createdAt', 'updatedAt']) &&
+             data.email is string && data.email.size() < 256 &&
+             (!('originAddr' in data) || (data.originAddr is string && data.originAddr.size() < 500)) &&
+             (!('destinationAddr' in data) || (data.destinationAddr is string && data.destinationAddr.size() < 500)) &&
+             (!('route' in data) || (data.route is string && data.route.size() < 10000)) &&
+             (!('schedule' in data) || (data.schedule is string && data.schedule.size() < 5000));
+    }
+
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidUser(request.resource.data);
+      allow update: if isOwner(userId) && isValidUser(request.resource.data);
+      allow delete: if false; // Users cannot delete their profiles for now
+    }
+  }
+}

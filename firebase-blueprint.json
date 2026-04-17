@@ -1,0 +1,25 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile and settings",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "format": "email" },
+        "originAddr": { "type": "string", "description": "Home address" },
+        "destinationAddr": { "type": "string", "description": "Destination address" },
+        "route": { "type": "string", "description": "Serialized JSON string of the commute route steps" },
+        "schedule": { "type": "string", "description": "Serialized JSON string of the weekly schedule" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["email"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User specific data collection"
+    }
+  }
+}

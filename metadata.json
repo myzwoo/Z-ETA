@@ -1,0 +1,5 @@
+{
+  "name": "Z-ETA (제때)",
+  "description": "실시간 교통 정보와 도보 속도를 비교하여 최적의 이동 페이스를 코칭해주는 출퇴근 도우미",
+  "requestFramePermissions": ["geolocation"]
+}
